@@ -37,6 +37,36 @@ void appendElement(Node *&head) {
    
 }
 
+void deleteLastElement(Node *&head) {
+    if (head == NULL) {
+        cout << "Empty already" << endl;
+        return;
+    }
+    else if (head->next == NULL) {
+        delete head;
+        head = NULL;
+        return;
+    }
+    Node *tmpNode = head;
+    while (tmpNode->next->next != NULL) {
+        tmpNode = tmpNode->next;
+    }
+
+    delete tmpNode->next; // delete last element
+    tmpNode->next = NULL;
+
+}
+
+void deleteFirstElement(Node *&head) {
+    if (head == NULL) {
+        cout << "List is empty\n";
+        return;
+    }
+    Node *first = head;
+    head = head->next;
+    delete first;
+}
+
 void displayElements(Node *head) {
     Node* tmpNode = head;
     if (tmpNode == NULL) {
@@ -73,6 +103,9 @@ int main() {
         }
     }
 
+    displayElements(head);
+
+    deleteFirstElement(head);
 
     displayElements(head);
 
