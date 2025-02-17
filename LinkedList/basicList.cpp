@@ -7,6 +7,13 @@ class Node {
         Node* next;
 };
 
+Node* prepareNode(int n, Node *next = nullptr) {
+    Node *newNode = new Node;
+    newNode->number = n;
+    newNode->next = next;
+    return newNode;
+}
+
 int getNumber() {
     int n;
     cout << "Enter a number: ";
@@ -19,9 +26,7 @@ void appendElement(Node *&head) {
     int n = getNumber();
 
     // prepare the new node
-    Node *newNode = new Node;
-    newNode->number = n;
-    newNode->next = NULL;
+    Node *newNode = prepareNode(n);
 
     // append the element
     if (head == NULL) {
@@ -35,6 +40,68 @@ void appendElement(Node *&head) {
         tmpNode->next = newNode;
     }
    
+}
+
+void insertAtFront(Node *&head) {
+    int n = getNumber();
+
+    Node* newNode = prepareNode(n, head);
+
+    head = newNode;
+}
+
+void insertAtIndex(Node *&head) {
+    int n = getNumber();
+    cout << "(expecting index)\n";
+    int index = getNumber();
+
+    Node* newNode = prepareNode(n);
+
+    if (index == 0) {
+        insertAtFront(head);
+        return;
+    }
+
+    /*
+        head: 2, ->2nd
+        2nd: 8, ->3rd
+        3rd: 4, -> 4th
+        4th: 12, -> NULL
+
+        tmpNode = 2, ->2nd
+        i = 0
+        index = 2
+
+        while (2nd != NULL && 0 < 1) /tmpNode->next = NULL/ {
+            tmpNode = tmpNode->next;
+            i++;
+        }
+        i = 1;
+        tmpNode = 8, 3rd;
+        3rd != NULL && 1 < 1 false
+        break
+
+        newNode->tmpNode->next; newNode -> 3rd
+        tmpNode->newNode; 
+    
+    */
+
+    Node* tmpNode = head;
+    int i = 0;
+    while (tmpNode->next != NULL && i < index - 1) {
+        tmpNode = tmpNode->next;
+        i++;
+    }
+
+    if (tmpNode == NULL) {
+        cout << "Index out of bound\n";
+        delete newNode;
+        return;
+    }
+
+    newNode->next = tmpNode->next;
+    tmpNode->next = newNode;
+
 }
 
 void deleteLastElement(Node *&head) {
@@ -65,6 +132,41 @@ void deleteFirstElement(Node *&head) {
     Node *first = head;
     head = head->next;
     delete first;
+}
+
+
+
+void deleteAtIndex(Node *&head) {
+    cout << "(expecting index)\n";
+    int index = getNumber();
+
+    if (head == NULL) {
+        cout << "List empty. cant delete anything\n";
+        return;
+    }
+
+    Node* tmpNode = head;
+    if (index == 0) {
+        
+        head = head->next;
+        delete tmpNode;
+        return;
+    }
+
+    int i = 0;
+    while (tmpNode->next != NULL && i < index - 1) {
+        tmpNode = tmpNode->next;
+        i++;
+    }
+
+    if (tmpNode->next == NULL) {
+        cout << "Index out of bound exception\n";
+        return;
+    }
+
+    Node *nodeToDelete = tmpNode->next;
+    tmpNode->next = tmpNode->next->next;
+    delete nodeToDelete;
 }
 
 void displayElements(Node *head) {
@@ -103,11 +205,10 @@ int main() {
         }
     }
 
-    displayElements(head);
-
-    deleteFirstElement(head);
+    insertAtFront(head);
 
     displayElements(head);
+
 
     freeList(head);
     return 0;
