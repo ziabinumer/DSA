@@ -2,8 +2,15 @@
 #include <stack>
 using namespace std;
 
+bool isNumber(char c) {
+    if (c - '0' >= 0 && c - '0' <= 9) {
+        return true;
+    }
+    return false;
+}
 bool isOperator(char c) {
     switch(c) {
+        case '%':
         case '/':
         case '*':
         case '-':
@@ -14,7 +21,7 @@ bool isOperator(char c) {
 }
 
 int precedence(char current) {
-    if (current == '/' || current == '*') {
+    if (current == '/' || current == '*' || current == '%') {
         return 2;
     }
     if (current == '+' || current == '-') {
@@ -23,10 +30,28 @@ int precedence(char current) {
     else return -1;
 }
 
+int calculator(char c, int v1, int v2) {
+    switch(c) {
+        case '+':
+            return v1 + v2;
+        case '-':
+            return v1 - v2;
+        case '*':
+            return v1 * v2;
+        case '/':
+            return v1 / v2;
+        case '%':
+            return v1 % v2;
+    };
+    return INT_MIN;
+}
+
 string convert(string exp) {
     stack<char> st;
     string newExp = "";
     int expLength = exp.length();
+
+    //
     for (int i = 0; i < expLength; i++) {
         char c = exp[i];
         if (c == ' ') {
@@ -58,7 +83,6 @@ string convert(string exp) {
         newExp += st.top();
         st.pop();
     }
-    cout << newExp << endl;
 
     return newExp;
     
@@ -68,51 +92,32 @@ void solve(string exp) {
     stack<int> st;
     int result;
     int expLen = exp.length();
-    cout << "len: " << expLen << endl;
+
+    //
     for (int i = 0; i < expLen; i++) {
-        cout << " ----  iteration " << i << " ----\n\n"; 
         
         char c = exp[i];
 
         if (isOperator(c)) {
-            cout << "---Operator read----" << endl;
             int v2 = st.top();
-            cout << "stack top: " << st.top() << " --- v1: " << v2 << endl;
             st.pop();
             int v1 = st.top();
-            cout << "stack top: " << st.top() << " --- v2: " << v1 << endl;
             st.pop();
 
+            result = calculator(c, v1, v2);
             
-            
-            switch(c) {
-                case '+':
-                    result = v1 + v2;
-                    break;
-                case '-':
-                    result = v1 - v2;
-                    break;
-                case '*':
-                    result = v1 * v2;
-                    break;
-                case '/':
-                    result = v1 / v2;
-                    break;
-            }
-            cout << "result: " << result << endl;
             st.push(result);
-            cout << "stack top: " << st.top() << endl;
 
+        }
+        else if (isNumber(c)) {
+            st.push(c - '0');
         }
         else {
-            st.push(c - '0');
-            cout << "pushing " << c << endl;
-            cout << "stack top now: " << st.top() << endl;
+            cout << "invalid expression. aborting \n";
+            return;
         }
-
-        cout << "\n\n";
+        
     }
-    cout << endl;
     cout << result << endl;
 }
 int main() {
@@ -122,6 +127,7 @@ int main() {
     cin >> exp;
 
     solve(convert(exp));
+
 
 
     return 0;
