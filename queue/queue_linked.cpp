@@ -92,6 +92,7 @@ public:
         cout << endl;
     }
 
+    // free queue
     ~Queue() {
         while (!isEmpty()) {
             dequeue();
