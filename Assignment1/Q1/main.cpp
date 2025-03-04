@@ -2,11 +2,30 @@
 #include <stdlib.h>
 #include <vector>
 #include <fstream>
+#include <sstream>
+#include <limits>
 using namespace std;
+
+class ProfileData {
+public:
+    int regNo;
+    string name, fatherName, birthDate, className;
+    int age;
+};
+
 
 class Screens {
 public:
-    void main() {
+    Screens() {
+        createCredentials();
+    }
+
+    void createCredentials() {
+        ofstream cred("credentials.txt", ios::out | ios::app);
+        cred.close();
+    }
+
+    void menu() {
         clearScreen();
 
         printLine();
@@ -34,15 +53,19 @@ public:
         
     }
 
-    void showMain() {
+    void showMenu() {
         cout << "\nPress something to continue\n";
         cin.ignore();
         cin.get();
-        main();
+        menu();
     }
 
     void clearScreen() {
-        system("cls") ? system("clear") : system("cls");
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
     }
 
     void printLine() {
@@ -58,51 +81,31 @@ public:
         items.push_back(input);
 
         do {
-            cout << "Enter password: ";
-            cin >> input;
+        cout << "Enter password: ";
+        cin >> input;
 
-            try {
-                if (stoi(input)) {}
-                else {
-                    throw exception();
-                }
-                if (stoi(input) > 10000 && stoi(input) < 65000) {
-                    break;
-                }
-                else {
-                    cout << "\nPassword must be between 10000 & 65000\n";
-                    continue;
-                }
+        try {
+            int pass = stoi(input); // Convert once
+            if (pass > 10000 && pass < 65000) {
+                break;
+            } else {
+                cout << "\nPassword must be between 10000 & 65000\n";
             }
-            catch(exception e) {
-                cout << "\nPassword must not be a string. Only digits accepted\n";
-                continue;
-            }
+        }
+            catch (exception &e) {
+            cout << "\nPassword must not be a string. Only digits accepted\n";
+        }
 
-        } while (true);
+    } while (true);
 
         
         items.push_back(input);
         return items;
     }
-    
-    void loginScreen() {
-        clearScreen();
-        printLine();
 
-        string username = authenticate(getCredentials());
-        if (username == "NOTFOUND") {
-            cout << "\nNo Matching Username Found\n";
-            showMain();
-        }
-        else {
-            // implement show profile
-        }
-    }
-
-    string authenticate(vector<string> cred) {
+    bool userExists(string username, string password, char flag) {
         ifstream credentials;
-        credentials.open("credentials.txt");
+        credentials.open("credentials.txt", ios::in);
 
         if (!credentials) {
             cout << "\nCredentials file is missing. Exiting the Program\n";
@@ -110,33 +113,124 @@ public:
             exit(1);
         }
 
-        string data;
-        string line = cred.at(0) + " " + cred.at(1);
+        string line, word;
+        
+        while (getline(credentials, line)) {
+        stringstream ss(line);
+        ss >> word;  // Read the first word (username)
+        
+        if (flag == 'a' && line == username + " " + password) return true;
+        if (flag == 'r' && word == username) return true;
+    }
+        return false;
+    }
+    void showProfile(string username) {
+        ifstream userFile(username + ".txt");
+        if (!userFile) {
+            cout << "User File was not found.\n";
+            
+            showMenu();
+            return;
+        }
+        string line;
+        printLine();
+        cout << "Showing Record of " << username << "\n\n";
+        while (getline(userFile, line)) {
+            cout << line << endl;
+        }
+        printLine();
+        showMenu();
+    }
+    void loginScreen() {
+        clearScreen();
+        printLine();
 
-        while (getline(credentials, data)) {
-            if (line == data) {
-                cout << "\nFound a user\n";
-                credentials.close();
-                return cred.at(0); 
+        vector<string> cred = getCredentials();
+        
+        if (userExists(cred.at(0), cred.at(1), 'a')) {
+            // implement show profile
+            cout << endl << cred.at(0) << " is Logged in\n";
+            showProfile(cred.at(0));
+        }
+        else {
+            cout << "\nUser not found\n";
+            showMenu();
+        }
+    }
+
+    int getInteger(string message) {
+        int num;
+        while (true) {
+            cout << message;
+            cin >> num;
+
+            if (cin.fail()) {  // If input is invalid (not an integer)
+                cin.clear();  // Clear the error flag
+                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
+                cout << "Invalid input! Please enter a valid integer.\n";
+            } else {
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                return num; // Return the valid integer
             }
         }
-        cout << "\nEither a user was not found. Or the password is incorrect\n";
-        credentials.close();
-        return "NOTFOUND";
     }
+
+    ProfileData getData() {
+        ProfileData d;
+        d.regNo = getInteger("Enter reg no: ");
+
+        cout << "Enter name: ";
+        cin.ignore();  // Ensure no leftover '\n' before using getline
+        getline(cin, d.name);
+
+        cout << "Enter father name: ";
+        getline(cin, d.fatherName);
+
+        cout << "Enter birth date (format: month, year): ";
+        getline(cin, d.birthDate);
+
+        d.age = getInteger("Enter age: ");
+
+        cout << "Enter class name: ";
+        getline(cin, d.className);
+
+        return d;
+    }
+
 
     void RegisterScreen() {
         clearScreen();
         printLine();
-        vector<string> cred = getCredentials();
-        string username = cred.at(0);
+        vector<string> cred;
+        do {
+            cred = getCredentials();
+            if (userExists(cred.at(0), cred.at(1), 'r')) {
+                cout << "\nUsername already exists. enter a different username\n";
+            }
+            else {
+                break;
+            }
+        } while (true);
+        
 
-            ofstream userFile(username + ".txt");
-            ofstream credentials("credentials.txt", ios::app);
-            credentials << username << " " << cred.at(1) << endl;
-            cout << "\nRegistered. \n";
-            // implement get Data
-            userFile.close();
+        ofstream credentials("credentials.txt", ios::app);
+        credentials << cred.at(0) << " " << cred.at(1) << endl;
+        cout << "\nRegistered. \n";
+
+        // get profile data
+        ProfileData data = getData();
+
+        // implement write profile data
+        ofstream userFile(cred.at(0) + ".txt", ios::out);
+        userFile << "Reg No: " << data.regNo << endl
+                 << "Name: " << data.name << endl
+                 << "Father Name: " << data.fatherName << endl
+                 << "Birth Date: " << data.birthDate << endl
+                 << "Age: " << data.age << endl
+                 << "Class Name: " << data.className << endl;
+
+
+        userFile.close();
 
     }
 
@@ -145,7 +239,7 @@ public:
 
 int main() {
     Screens main;
-    main.main();
+    main.menu();
 
     return 0;
 }
