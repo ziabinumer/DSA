@@ -87,6 +87,17 @@ string extractExp(string filename) {
     return line;
 }
 
+string reverseExp(const string &exp) {
+    string result = "";
+    int expLength = exp.length();
+
+    for (int i = expLength - 1; i >= 0; i--) {
+        result += exp[i];
+    }
+
+    return result; 
+}
+
 string infixToPostfix(const string& exp) {
     LinkedList stack;
     string result = "";
@@ -123,7 +134,19 @@ string infixToPostfix(const string& exp) {
     return result;
 }
 
-string infixToPrefix(const string& exp) {}
+string infixToPrefix(string exp) {
+    reverse(exp.begin(), exp.end());
+
+    for (int i = 0; i < exp.length(); i++) {
+        if (exp[i] == '(') exp[i] = ')';
+        else if (exp[i] == ')') exp[i] = '(';
+    }
+
+    string exp = infixToPostfix(exp);
+
+    reverse(exp.begin(), exp.end());
+    return exp;
+}
 
 string postfixToInfix(const string& exp) {}
 
@@ -145,7 +168,8 @@ int main(int argc, char* argv[]) {
 
     if (filename == "infix.txt") {
         postfix = infixToPostfix(extractExp(filename));
-        //prefix = infixToPrefix(extractExp(filename));
+        prefix = infixToPrefix(extractExp(filename));
+        cout << prefix << endl;
         
         // write to postfix file
         writeToFile("postfix.txt", postfix);
@@ -164,5 +188,6 @@ int main(int argc, char* argv[]) {
 
         writeToFile("infix2.txt", infix2);
     }
+
     return 0;
 }
