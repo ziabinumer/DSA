@@ -48,6 +48,7 @@ public:
         return ""; 
     }
 
+    // destructor to free the list
     ~LinkedList() {
         while(!isEmpty()) {
             pop();
@@ -77,6 +78,7 @@ int precedence(char op) {
     else return INT_MIN;
 }
 
+// reads expression from file and returns
 string extractExp(string filename) {
     ifstream inFile(filename);
     string line;
@@ -130,21 +132,30 @@ string infixToPostfix(const string& exp, char flag) {
 }
 
 string infixToPrefix(string exp) {
+    // reverse to make it compatible with infixtopostfix
     reverse(exp.begin(), exp.end());
 
+    // swap brackets
     for (int i = 0; i < exp.length(); i++) {
         if (exp[i] == '(') exp[i] = ')';
         else if (exp[i] == ')') exp[i] = '(';
     }
 
+    // get converted exp
     exp = infixToPostfix(exp, 'r');
 
+    // reverse again to get in correct order
     reverse(exp.begin(), exp.end());
     return exp;
 }
 
 string postfixToInfix(const string& exp) {
     LinkedList stack;
+
+    // push if find a variable or a number
+    // if operator is read then remove two elements from stack
+    // store the elements in format: (first statement + second statement)
+    // this leaves the stack with a single element which is the converted exp
 
     for (int i = 0; i < exp.length(); i++) {
         char current = exp[i];
@@ -161,10 +172,15 @@ string postfixToInfix(const string& exp) {
 }
 
 string prefixToInfix(string exp) {
+    // reverse the exp to make it compatible with postfixtoinfix
+    // convert to postfix
+    // reverse again to have the exp in given order
     reverse(exp.begin(), exp.end());
     exp = postfixToInfix(exp);
     reverse(exp.begin(), exp.end());
 
+    // swap brackets to put at correct position
+    // because reverse will kind of invert them
     for (int i = 0; i < exp.length(); i++) {
         if (exp[i] == '(') exp[i] = ')';
         else if (exp[i] == ')') exp[i] = '(';
