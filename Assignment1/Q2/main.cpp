@@ -3,10 +3,10 @@
 using namespace std;
 
 struct Node {
-    char element;
+    string element;
     Node* next;
 
-    Node(char element) {
+    Node(string element) {
         this->element = element;
         this->next = nullptr;
     }
@@ -24,7 +24,7 @@ public:
         return top == nullptr;
     }
 
-    void push(char element) {
+    void push(string element) {
         Node* newNode = new Node(element);
         newNode->next = top;
         top = newNode;
@@ -41,22 +41,20 @@ public:
         delete tmpNode;
     }
 
-    char getTop() {
+    string getTop() {
         if (!isEmpty()) {
             return top->element;
         }
-        return '\0'; 
+        return ""; 
+    }
+
+    ~LinkedList() {
+        while(!isEmpty()) {
+            pop();
+        }
     }
 };
 
-/*
-bool isInteger(char digit) {
-    if (digit - '0' >= 0 && digit - '0' <= 9) {
-        return true;
-    }
-    return false;
-}
-*/
 bool isOperator(char c) {
     switch(c) {
         case '%':
@@ -87,18 +85,7 @@ string extractExp(string filename) {
     return line;
 }
 
-string reverseExp(const string &exp) {
-    string result = "";
-    int expLength = exp.length();
-
-    for (int i = expLength - 1; i >= 0; i--) {
-        result += exp[i];
-    }
-
-    return result; 
-}
-
-string infixToPostfix(const string& exp) {
+string infixToPostfix(const string& exp, char flag) {
     LinkedList stack;
     string result = "";
 
@@ -108,21 +95,29 @@ string infixToPostfix(const string& exp) {
         char current  = exp[i];
         if (current == ' ') continue;
         if (current == '(') {
-            stack.push(current);
+            stack.push(string(1, current));
         }
         else if (current == ')') {
-            while (stack.getTop() != '(') {
+            while (stack.getTop() != "(") {
                 result += stack.getTop();
                 stack.pop();
             }
             stack.pop();
         }
         else if (isOperator(current)) {
-            while (!stack.isEmpty() && precedence(current) <= precedence(stack.getTop())) {
-                result += stack.getTop();
-                stack.pop();
+            if (flag == 'r') {
+                while (!stack.isEmpty() && precedence(current) < precedence(stack.getTop()[0])) {
+                    result += stack.getTop();
+                    stack.pop();
+                }
             }
-            stack.push(current);
+            else if (flag == 's') {
+                while (!stack.isEmpty() && precedence(current) <= precedence(stack.getTop()[0])) {
+                    result += stack.getTop();
+                    stack.pop();
+                }
+            }
+            stack.push(string(1, current));
         }
         else result += current;
     }
@@ -142,15 +137,41 @@ string infixToPrefix(string exp) {
         else if (exp[i] == ')') exp[i] = '(';
     }
 
-    string exp = infixToPostfix(exp);
+    exp = infixToPostfix(exp, 'r');
 
     reverse(exp.begin(), exp.end());
     return exp;
 }
 
-string postfixToInfix(const string& exp) {}
+string postfixToInfix(const string& exp) {
+    LinkedList stack;
 
-string prefixToInfix(const string& exp) {}
+    for (int i = 0; i < exp.length(); i++) {
+        char current = exp[i];
+        if (!isOperator(current)) {
+            stack.push(string(1, current));
+        } else {
+            string op2 = stack.getTop(); stack.pop();
+            string op1 = stack.getTop(); stack.pop();
+            string newExp = "(" + op1 + current + op2 + ")";
+            stack.push(newExp);
+        }
+    }
+    return stack.getTop();
+}
+
+string prefixToInfix(string exp) {
+    reverse(exp.begin(), exp.end());
+    exp = postfixToInfix(exp);
+    reverse(exp.begin(), exp.end());
+
+    for (int i = 0; i < exp.length(); i++) {
+        if (exp[i] == '(') exp[i] = ')';
+        else if (exp[i] == ')') exp[i] = '(';
+    }
+
+    return exp;
+}
 
 void writeToFile(string filename, string content) {
     ofstream outFile(filename, ios::out);
@@ -167,15 +188,11 @@ int main(int argc, char* argv[]) {
     string postfix, prefix, infix, infix2;
 
     if (filename == "infix.txt") {
-        postfix = infixToPostfix(extractExp(filename));
+        postfix = infixToPostfix(extractExp(filename), 's');
         prefix = infixToPrefix(extractExp(filename));
-        cout << prefix << endl;
         
-        // write to postfix file
         writeToFile("postfix.txt", postfix);
-
-        // write to prefix file
-        //writeToFile("prefix.txt", prefix);
+        writeToFile("prefix.txt", prefix);
         
     }
     else if (filename == "postfix.txt") {
