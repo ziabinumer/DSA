@@ -125,6 +125,7 @@ public:
         return false;
     }
     void showProfile(string username) {
+        clearScreen();
         ifstream userFile(username + ".txt");
         if (!userFile) {
             cout << "User File was not found.\n";
@@ -138,19 +139,33 @@ public:
         while (getline(userFile, line)) {
             cout << line << endl;
         }
-        printLine();
-        showMenu();
+        cout << "Press something to continue";
+        cin.ignore();
+        cin.get();
+        showProfileMenu(username);
+        
     }
+
+    void showProfileMenu(string username) {
+        clearScreen();
+            cout << endl << username << " is Logged in\n";
+            string choice;
+            cout << "1. Show Profile\n2. Overwrite Profile\n3. Exit to main menu\n ";
+            cin >> choice;
+            if (choice == "1") {
+                showProfile(username);
+            } else if (choice == "3") {showMenu();} else createProfile(username);
+    }
+
     void loginScreen() {
         clearScreen();
         printLine();
-
         vector<string> cred = getCredentials();
         
         if (userExists(cred.at(0), cred.at(1), 'a')) {
             // implement show profile
-            cout << endl << cred.at(0) << " is Logged in\n";
-            showProfile(cred.at(0));
+            showProfileMenu(cred.at(0));
+            
         }
         else {
             cout << "\nUser not found\n";
@@ -197,6 +212,25 @@ public:
         return d;
     }
 
+    void createProfile(string username) {
+        clearScreen();
+        cout << "---- Get Profile Data ----\n";
+        // get profile data
+        ProfileData data = getData();
+
+        // implement write profile data
+        ofstream userFile(username + ".txt", ios::out);
+        userFile << "Reg No: " << data.regNo << endl
+                 << "Name: " << data.name << endl
+                 << "Father Name: " << data.fatherName << endl
+                 << "Birth Date: " << data.birthDate << endl
+                 << "Age: " << data.age << endl
+                 << "Class Name: " << data.className << endl;
+
+
+        userFile.close();
+        showProfileMenu(username);
+    }
 
     void RegisterScreen() {
         clearScreen();
@@ -217,20 +251,16 @@ public:
         credentials << cred.at(0) << " " << cred.at(1) << endl;
         cout << "\nRegistered. \n";
 
-        // get profile data
-        ProfileData data = getData();
+        string choice;
+        cout << "Do you want to create profile? [y] ";
+        cin >> choice;
 
-        // implement write profile data
-        ofstream userFile(cred.at(0) + ".txt", ios::out);
-        userFile << "Reg No: " << data.regNo << endl
-                 << "Name: " << data.name << endl
-                 << "Father Name: " << data.fatherName << endl
-                 << "Birth Date: " << data.birthDate << endl
-                 << "Age: " << data.age << endl
-                 << "Class Name: " << data.className << endl;
+        if (choice == "y" || choice == "Y") {
+            createProfile(cred.at(0));
 
-
-        userFile.close();
+        }
+        showMenu();
+        
 
     }
 
