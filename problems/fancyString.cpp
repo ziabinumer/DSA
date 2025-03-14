@@ -16,13 +16,12 @@ string fancyString(string s) {
             prev = c;
             count = 1;
         }
-        cout << "adding " << c << " to " << newS << endl;
         newS += c;
     }
     return newS;
 }
 
 int main() {
-    fancyString("leeeetcode");
+    cout << fancyString("leeeeeetcode") << endl;
     return 0;
 }
