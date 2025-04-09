@@ -2,120 +2,156 @@
 using namespace std;
 
 struct Node {
-    int number;
+    int num;
     Node* next;
     Node* prev;
+
+    Node(int n) {
+        this->num = n;
+        this->next = nullptr;
+        this->prev = nullptr;
+    }
 };
 
-class DoublyLinked {
-    public:
+class List {
+public:
     Node* head;
     Node* tail;
-
-    DoublyLinked() {
-        head = nullptr;
-        tail = nullptr;
-    }
-
-    int getNumber() {
-        int n;
-        cout << "enter number: ";
-        cin >> n;
-        return n;
-    }
-
-    Node* createNode(int n, Node *next = nullptr, Node *prev = nullptr) {
-        Node* newNode = new Node;
-        newNode->number = n;
-        newNode->next = next;
-        newNode->prev = prev;
-        return newNode;
+    List() {
+        head = tail = nullptr;
     }
 
     bool isEmpty() {
-        return this->head == nullptr ? true : false;
+        if (head == nullptr) {
+            return true;
+        }
+        return false;
     }
 
-    void createList(int n) {
-
-        // prepare the node 
-        Node* newNode = createNode(n);
-        this->head = newNode;
-        this->tail = newNode;
-    }   
-
-    void insertItem() {
-        int n = getNumber();
-
-        
+    void insertItem(int n) {
+        Node* newNode = new Node(n);
         if (isEmpty()) {
-            createList(n);
+            head = tail = newNode;
             return;
         }
-
-        // prepare Node to insert
-        Node* newNode = createNode(n, nullptr, tail);
-
+        newNode->prev = tail;
         tail->next = newNode;
         tail = newNode;
     }
 
-    void deleteLastItem() {
+    void deleteLast() {
         if (isEmpty()) {
-            cout << "List is empty\n";
             return;
         }
-
-        Node* tmpNode = tail;
-        if (tail == head) {
-            head = nullptr;
-            tail = nullptr;
+        if (head == tail) {
+            delete tail;
+            tail = head = nullptr;
+            return;
         }
-        else {
-            this->tail = tail->prev;
-            this->tail->next = nullptr;
-        }
-        delete tmpNode;
+        Node* secondLast = tail->prev;
+        delete tail;
+        tail = secondLast;
+        tail->next = nullptr;
     }
 
-    void displayElements() {
+    void deleteFirst() {
         if (isEmpty()) {
-            cout << "List is empty\n";
             return;
         }
-        Node* tmpNode = this->head;
-        
-        while(tmpNode != NULL) {
-            cout << tmpNode->number << endl;
-            tmpNode = tmpNode->next;
+        if (head == tail) {
+            delete tail;
+            tail = head = nullptr;
+            return;
         }
-
-        cout << endl;
+        Node* tmpHead = head->next;
+        delete head;
+        head = tmpHead;
+        head->prev = nullptr;
     }
 
+    void deleteAtIndex(int index) {
+        if (isEmpty()) {
+            cout << "List empty\n";
+            return;
+        }
+    
+        if (index == 0) {  
+            deleteFirst();  
+            return;
+        }
+    
+        int count = 0;
+        Node* current = head;
+        while (current != nullptr && count < index) {
+            current = current->next;
+            count++;
+        }
+    
+        if (current == nullptr) { 
+            cout << "Index out of bounds." << endl;
+            return;
+        }
+    
+        // Handling removal of current node
+        if (current->prev != nullptr) {
+            current->prev->next = current->next;
+        }
+        if (current->next != nullptr) {
+            current->next->prev = current->prev;
+        }
+    
+        // If we delete the tail node, we need to update the tail pointer
+        if (current->next == nullptr) {
+            tail = current->prev;
+        }
+    
+        delete current;
+    }
 
-    void freeList() {
+    void printList() {
         if (isEmpty()) {
             return;
         }
-        while (this->head != nullptr) {
-            Node* tmpNode = head->next;
+        cout << "Head: " << head->num << " Tail: " << tail->num << endl;
+        Node* currentNode = head;
+        while (currentNode != nullptr) {
+            cout << "Current: " << currentNode->num << " | ";
+    
+            if (currentNode->prev != nullptr)
+                cout << "prev: " << currentNode->prev->num << " | ";
+            else
+                cout << "prev: NULL | ";
+    
+            if (currentNode->next != nullptr)
+                cout << "next: " << currentNode->next->num << endl;
+            else
+                cout << "next: NULL" << endl;
+    
+            currentNode = currentNode->next;
+        }
+    }
+
+    ~List() {
+        Node* tmpNode;
+        while (head != nullptr) {
+            tmpNode = head->next;
             delete head;
             head = tmpNode;
         }
-        tail = nullptr;
     }
 };
 
-
 int main() {
-    DoublyLinked list;
-    list.insertItem();
-    list.insertItem();
-    list.insertItem();
-    list.deleteLastItem();
-    list.displayElements();
-    
-    list.freeList();
+    List list;
+
+    for (int i = 0; i < 5; i++) {
+        list.insertItem((i + 2) * 3 - 5);
+    }
+
+    list.printList();
+    list.deleteAtIndex(0);
+    list.printList();
+
+
     return 0;
 }
