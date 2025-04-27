@@ -21,6 +21,15 @@ public:
     void setName(string name) {courseName = name;}
     void setHours(int hours) {crHours = hours;}
 
+    // 
+    void display() {
+        cout << "----------------------------" << endl
+             << "ID: " << courseId << endl
+             << "Name: " << courseName << endl
+             << "Cr Hours: " << crHours << endl
+             << "----------------------------" << endl;
+    }
+
 };
 
 struct Node {
@@ -34,6 +43,10 @@ struct Node {
         this->course = course;
         this->left = nullptr;
         this->right = nullptr;
+    }
+
+    void display() {
+        course.display();
     }
 };
 
@@ -105,9 +118,13 @@ class BST {
         }
     }
 
-    Node* displayHelper(Node* node) {
-        return node;
+    void displayHelper(Node* node) {
+        if (!node) return;
+        displayHelper(node->left);   
+        node->course.display();      
+        displayHelper(node->right);  
     }
+    
 
     int totalHelper(Node* node) {
         if (!node) return 0;
@@ -161,11 +178,7 @@ public:
         }
     
         cout << "Found Course with Id " << id << endl;
-        cout << "----------------------------" << endl
-             << "ID: " << id << endl
-             << "Name: " << node->course.getName() << endl
-             << "Cr Hours: " << node->course.getHours() << endl
-             << "----------------------------" << endl;
+        node->display();
     
         return true;
     }
@@ -207,13 +220,8 @@ int main() {
     courseData.addCourse(Course(30, "Discrete Mathematics", 3));
     courseData.addCourse(Course(13, "Computer Graphics", 4));
 
-    courseData.searchCourse(13);
-    courseData.deleteCourse(13);
-    courseData.searchCourse(13);
-    courseData.totalCourses();
-    courseData.minCourseId();
-    courseData.maxCourseId();
-    courseData.treeHeight();
+    
+    courseData.displayAscending();
     
     return 0;
 }
