@@ -1,3 +1,12 @@
+/*
+    Name: Zia ur Rehman
+    Reg No: 5005-FOC/BSCS/F23
+    Section: B
+    Course: DSA (Sir. Saqlain)
+
+    Code available at: 
+*/
+
 #include "AVL.h"
 
 int main() {
