@@ -199,9 +199,9 @@ public:
         cout << string(level * 2, ' ');
 
         if (node->type == "file") {
-            cout << "📄 " << node->name << endl;
+            cout << "f: " << node->name << endl;
         } else {
-            cout << "📁 " << node->name << endl;
+            cout << "d: " << node->name << endl;
         }
 
         for (Node* child : node->children) {
