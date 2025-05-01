@@ -1,3 +1,5 @@
+This file was generated with the help of AI
+
 # File System Hierarchy Simulator
 
 A simple C++ terminal-based simulation of a file system that allows users to create folders and files, list contents, search, reset, and more—mimicking basic shell commands.

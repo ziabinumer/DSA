@@ -1,3 +1,5 @@
+This file was generated with the help of AI
+
 # Course Management System (BST + AVL)
 
 ## 📚 Overview
