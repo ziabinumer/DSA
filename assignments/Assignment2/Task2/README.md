@@ -1,4 +1,4 @@
-This file was generated with the help of AI
+This file (README.md) was generated with the help of AI
 
 # File System Hierarchy Simulator
 
