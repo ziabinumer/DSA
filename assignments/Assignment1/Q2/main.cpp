@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <climits>
 using namespace std;
 
 struct Node {
@@ -55,6 +56,21 @@ public:
         }
     }
 };
+
+string reverse(string exp) {
+    LinkedList st1;
+    for (int i = 0; i < exp.length(); i++) {
+        st1.push(string(1, exp[i]));
+    }
+
+    exp = "";
+
+    while (!st1.isEmpty()) {
+        exp += st1.getTop();
+        st1.pop();
+    }
+    return exp;
+}
 
 bool isOperator(char c) {
     switch(c) {
@@ -133,7 +149,7 @@ string infixToPostfix(const string& exp, char flag) {
 
 string infixToPrefix(string exp) {
     // reverse to make it compatible with infixtopostfix
-    reverse(exp.begin(), exp.end());
+    exp = reverse(exp);
 
     // swap brackets
     for (int i = 0; i < exp.length(); i++) {
@@ -144,9 +160,8 @@ string infixToPrefix(string exp) {
     // get converted exp
     exp = infixToPostfix(exp, 'r');
 
-    // reverse again to get in correct order
-    reverse(exp.begin(), exp.end());
-    return exp;
+    // reverse again to get in correct order - brackets mess up
+    return reverse(exp);
 }
 
 string postfixToInfix(const string& exp) {
@@ -175,9 +190,9 @@ string prefixToInfix(string exp) {
     // reverse the exp to make it compatible with postfixtoinfix
     // convert to postfix
     // reverse again to have the exp in given order
-    reverse(exp.begin(), exp.end());
+    exp = reverse(exp);
     exp = postfixToInfix(exp);
-    reverse(exp.begin(), exp.end());
+    exp = reverse(exp);
 
     // swap brackets to put at correct position
     // because reverse will kind of invert them
