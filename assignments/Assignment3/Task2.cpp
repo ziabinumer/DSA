@@ -138,52 +138,13 @@ public:
             distance initially infinite (can achieve using INT_MAX)
             store distance in dist vector
             create parent vector to remember paths
-            use priorty queue
 
         */
         int n = cities.size();
         vector<int> dist(n, INT_MAX); // create a vector of n length and initialize each val large
         vector<int> parent(n, -1); // create another vector of n l and give each -1 (indicating no city)
-        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
-
-        dist[start] = 0;
-        pq.push({0, start});
-
-        while (!pq.empty()) {
-            int d = pq.top().first;
-            int u = pq.top().second;
-            pq.pop();
-
-            for (auto r : roads[u]) {
-                int v = r.first;
-                int w = r.second;
-                if (dist[u] + w < dist[v]) {
-                    dist[v] = dist[u] + w;
-                    parent[v] = u;
-                    pq.push({dist[v], v});
-                }
-            }
-        }
-
-        if (dist[end] == INT_MAX) {
-            cout << "No path found from " << startCity << " to " << endCity << endl;
-            return;
-        }
-
-        // Build path
-        vector<int> path;
-        for (int cur = end; cur != -1; cur = parent[cur]) {
-            path.push_back(cur);
-        }
-        reverse(path.begin(), path.end());
-
-        // Show path
-        cout << "Shortest path: ";
-        for (int i = 0; i < path.size(); i++) {
-            cout << cities[path[i]];
-            if (i != path.size() - 1) cout << " -> ";
-        }
-        cout << "\nTotal distance: " << dist[end] << " km\n";
+        
+        // traversal
     }
 };
 
